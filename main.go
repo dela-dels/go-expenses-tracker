@@ -15,13 +15,11 @@ func main() {
 	router.LoadHTMLGlob("templates/**/*.html")
 	router.Static("public/css", "public/css")
 
-	database, error := sql.Open("mysql", "root:@tcp(localhost:3306)/go_expenses")
+	_, error := sql.Open("mysql", "root:@tcp(localhost:3306)/go_expenses")
 
 	if error != nil {
 		log.Fatal("Could not connect to database. Error", error)
 	}
-
-	println(database)
 
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "home.html", gin.H{})

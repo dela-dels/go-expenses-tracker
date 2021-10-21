@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/dela-dels/go-expenses-tracker/database"
 	"github.com/dela-dels/go-expenses-tracker/database/models"
+	"github.com/dela-dels/go-expenses-tracker/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -18,6 +18,8 @@ type UserRegistrationDetails struct {
 	Email     string `form:"email"`
 	Password  string `form:"password"`
 }
+
+var registrationError string
 
 func ShowRegistrationForm(context *gin.Context) {
 	context.HTML(http.StatusOK, "registration.html", gin.H{})
@@ -32,10 +34,6 @@ func Register(context *gin.Context) {
 	}
 
 	db.AutoMigrate(models.User{})
-
-	if err := context.Request.ParseForm(); err != nil {
-		log.Fatal(err)
-	}
 
 	password, err := hashPassword(context.PostForm("password"))
 
@@ -55,11 +53,19 @@ func Register(context *gin.Context) {
 		Lastname:  userRegistrationDetails.Lastname,
 		Email:     userRegistrationDetails.Email,
 		Password:  userRegistrationDetails.Password,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	})
 
-	log.Println(results)
+	if utils.ConvertGormErrorToStruct(results.Error).Code == 1062 {
+		registrationError = "The email you provided has already been taken"
+	}
+
+	if results.Error != nil {
+		context.HTML(http.StatusOK, "registration.html", gin.H{
+			"errors": map[string]string{
+				"email": registrationError,
+			},
+		})
+	}
 }
 
 func hashPassword(password string) (string, error) {
