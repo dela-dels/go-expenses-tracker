@@ -12,14 +12,36 @@
 <body>
   <div class="flex items-center justify-center min-h-screen px-4 py-12 bg-gray-50 sm:px-6 lg:px-8">
     <div class="w-full max-w-md space-y-8">
-      {{ if .errors }}
+      <div>
+        {{ if .data }}
+        <h3>
+          {{ .data }}
+        </h3>
+        {{ end }}
+      </div>
+      {{ if .gorm_error }}
       <div class="p-5 bg-red-100 rounded-lg">
         {{ range $key, $value := . }}
         <li>
           <ul class="text-sm font-semibold text-red-800">
-            {{ $value.email }}
+            {{ $value }}
           </ul>
         </li>
+        {{ end }}
+      </div>
+      {{ end }}
+
+      {{ if .validation_errors }}
+      <div class="p-5 bg-red-100 rounded-lg">
+        {{ range $key, $value := . }}
+
+        {{ range $index, $error := . }}
+        <li>
+          <ul class="text-sm font-semibold text-red-800">
+            {{ $error }}
+          </ul>
+        </li>
+        {{ end }}
         {{ end }}
       </div>
       {{ end }}
@@ -32,20 +54,20 @@
         <input type="hidden" name="remember" value="true" />
         <div class="-space-y-px rounded-md shadow-sm">
           <div>
-            <label for="email-address" class="sr-only">First Name</label>
+            <label for="first_name" class="sr-only">First Name</label>
             <input id="first_name" name="first_name" type="string" autocomplete="first_name"
               class="relative block w-full px-3 py-2 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-none appearance-none rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               placeholder="Firstname" />
           </div>
           <div>
-            <label for="email-address" class="sr-only">First Name</label>
+            <label for="last_name" class="sr-only">First Name</label>
             <input id="last_name" name="last_name" type="string" autocomplete="last_name"
               class="relative block w-full px-3 py-2 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-none appearance-none rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               placeholder="Lastname" />
           </div>
           <div>
             <label for="email-address" class="sr-only">Email address</label>
-            <input id="email-address" name="email" type="email" autocomplete="email"
+            <input id="email-address" name="email" autocomplete="email"
               class="relative block w-full px-3 py-2 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-none appearance-none rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               placeholder="Email address" />
           </div>

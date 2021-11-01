@@ -7,19 +7,21 @@ import (
 
 	"github.com/dela-dels/go-expenses-tracker/database"
 	"github.com/dela-dels/go-expenses-tracker/database/models"
-	"github.com/dela-dels/go-expenses-tracker/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRegistrationDetails struct {
-	Firstname string `form:"fist_name"`
-	Lastname  string `form:"last_name"`
-	Email     string `form:"email"`
-	Password  string `form:"password"`
+	Firstname string `validate:"required"`
+	Lastname  string `validate:"required"`
+	Email     string `validate:"required,unique-email"`
+	Password  string `validate:"required,gte=8"`
 }
 
-var registrationError string
+var validate *validator.Validate
+
+var db, connectionError = database.Connect()
 
 func ShowRegistrationForm(context *gin.Context) {
 	context.HTML(http.StatusOK, "registration.html", gin.H{})
@@ -27,19 +29,13 @@ func ShowRegistrationForm(context *gin.Context) {
 
 func Register(context *gin.Context) {
 
-	db, err := database.Connect()
-
-	if err != nil {
-		fmt.Printf("could not connect to the database. Error : %s", err)
+	if connectionError != nil {
+		log.Fatalf("could not connect to the database. Error : %s", connectionError)
 	}
 
 	db.AutoMigrate(models.User{})
 
-	password, err := hashPassword(context.PostForm("password"))
-
-	if err != nil {
-		log.Fatal("unable to hash password")
-	}
+	password, _ := hashPassword(context.PostForm("password"))
 
 	userRegistrationDetails := UserRegistrationDetails{
 		context.PostForm("first_name"),
@@ -48,27 +44,53 @@ func Register(context *gin.Context) {
 		password,
 	}
 
-	results := db.Create(&models.User{
-		Firstname: userRegistrationDetails.Firstname,
-		Lastname:  userRegistrationDetails.Lastname,
-		Email:     userRegistrationDetails.Email,
-		Password:  userRegistrationDetails.Password,
-	})
+	validationErrors := validatUserRegistrationStruct(userRegistrationDetails)
 
-	if utils.ConvertGormErrorToStruct(results.Error).Code == 1062 {
-		registrationError = "The email you provided has already been taken"
-	}
-
-	if results.Error != nil {
+	if len(validationErrors) > 0 {
 		context.HTML(http.StatusOK, "registration.html", gin.H{
-			"errors": map[string]string{
-				"email": registrationError,
-			},
+			"validation_errors": validationErrors,
 		})
+
+	} else {
+		db.Create(&models.User{
+			Firstname: userRegistrationDetails.Firstname,
+			Lastname:  userRegistrationDetails.Lastname,
+			Email:     userRegistrationDetails.Email,
+			Password:  userRegistrationDetails.Password,
+		})
+
+		context.HTML(http.StatusOK, "dashboard.html", gin.H{})
 	}
 }
 
 func hashPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(hashedPassword), err
+}
+
+func validatUserRegistrationStruct(userRegistrationDetails UserRegistrationDetails) map[string]string {
+	validate = validator.New()
+	validate.RegisterValidation("unique-email", validateEmailToBeUnique)
+
+	var userRegistrationValidationErrors = map[string]string{}
+	err := validate.Struct(userRegistrationDetails)
+
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			if err.Tag() == "unique-email" {
+				userRegistrationValidationErrors[err.Field()] =
+					fmt.Sprintf("The %v provided has already been taken", err.Field())
+			} else {
+				userRegistrationValidationErrors[err.Field()] =
+					fmt.Sprintf("The %v field is %v", err.Field(), err.Tag())
+			}
+		}
+	}
+
+	return userRegistrationValidationErrors
+}
+
+func validateEmailToBeUnique(fl validator.FieldLevel) bool {
+	results := db.Where("email = ?", fl.Field().String()).Find(&models.User{})
+	return results.RowsAffected != 1
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
@@ -14,12 +13,6 @@ func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/**/*.html")
 	router.Static("public/css", "public/css")
-
-	_, error := sql.Open("mysql", "root:@tcp(localhost:3306)/go_expenses")
-
-	if error != nil {
-		log.Fatal("Could not connect to database. Error", error)
-	}
 
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "home.html", gin.H{})
