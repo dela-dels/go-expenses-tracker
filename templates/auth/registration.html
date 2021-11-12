@@ -32,19 +32,21 @@
       {{ end }}
 
       {{ if .validation_errors }}
-      <div class="p-5 bg-red-100 rounded-lg">
+      <div class="p-5 bg-red-200 rounded-lg">
         {{ range $key, $value := . }}
 
         {{ range $index, $error := . }}
-        <li>
+        <li class="px-3">
           <ul class="text-sm font-semibold text-red-800">
             {{ $error }}
           </ul>
         </li>
         {{ end }}
+
         {{ end }}
       </div>
       {{ end }}
+
       <div>
         <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900">
           Create An Account

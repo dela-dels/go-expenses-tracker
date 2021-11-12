@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/dela-dels/go-expenses-tracker/database"
 	"github.com/dela-dels/go-expenses-tracker/database/models"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -44,7 +48,7 @@ func Register(context *gin.Context) {
 		password,
 	}
 
-	validationErrors := validatUserRegistrationStruct(userRegistrationDetails)
+	validationErrors := userRegistrationDetails.validate()
 
 	if len(validationErrors) > 0 {
 		context.HTML(http.StatusOK, "registration.html", gin.H{
@@ -58,9 +62,15 @@ func Register(context *gin.Context) {
 			Email:     userRegistrationDetails.Email,
 			Password:  userRegistrationDetails.Password,
 		})
-
-		context.HTML(http.StatusOK, "dashboard.html", gin.H{})
 	}
+
+	session := sessions.Default(context)
+	randomSessionValue, _ := uuid.NewRandom()
+	session.Set(os.Getenv("APP_NAME"), randomSessionValue.String())
+	session.Save()
+
+	context.SetCookie(os.Getenv("APP_NAME"), randomSessionValue.String(), time.Now().Hour(), "/", os.Getenv("APP_URL"), true, true)
+	context.Redirect(http.StatusFound, "home")
 }
 
 func hashPassword(password string) (string, error) {
@@ -68,12 +78,12 @@ func hashPassword(password string) (string, error) {
 	return string(hashedPassword), err
 }
 
-func validatUserRegistrationStruct(userRegistrationDetails UserRegistrationDetails) map[string]string {
+func (u UserRegistrationDetails) validate() map[string]string {
 	validate = validator.New()
 	validate.RegisterValidation("unique-email", validateEmailToBeUnique)
 
 	var userRegistrationValidationErrors = map[string]string{}
-	err := validate.Struct(userRegistrationDetails)
+	err := validate.Struct(u)
 
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
