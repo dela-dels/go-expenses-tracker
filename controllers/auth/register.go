@@ -23,8 +23,6 @@ type UserRegistrationDetails struct {
 	Password  string `validate:"required,gte=8"`
 }
 
-var validate *validator.Validate
-
 var db, connectionError = database.Connect()
 
 func ShowRegistrationForm(context *gin.Context) {
@@ -51,7 +49,7 @@ func Register(context *gin.Context) {
 	validationErrors := userRegistrationDetails.validate()
 
 	if len(validationErrors) > 0 {
-		context.HTML(http.StatusOK, "registration.html", gin.H{
+		context.HTML(http.StatusPermanentRedirect, "registration.html", gin.H{
 			"validation_errors": validationErrors,
 		})
 
@@ -79,7 +77,7 @@ func hashPassword(password string) (string, error) {
 }
 
 func (u UserRegistrationDetails) validate() map[string]string {
-	validate = validator.New()
+	validate := validator.New()
 	validate.RegisterValidation("unique-email", validateEmailToBeUnique)
 
 	var userRegistrationValidationErrors = map[string]string{}
@@ -87,6 +85,9 @@ func (u UserRegistrationDetails) validate() map[string]string {
 
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
+
+			// Check to see of the provided email already exists in storage
+			// and pass the error as part of the validation errors
 			if err.Tag() == "unique-email" {
 				userRegistrationValidationErrors[err.Field()] =
 					fmt.Sprintf("The %v provided has already been taken", err.Field())
