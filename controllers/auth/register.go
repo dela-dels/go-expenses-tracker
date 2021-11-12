@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -23,18 +22,13 @@ type UserRegistrationDetails struct {
 	Password  string `validate:"required,gte=8"`
 }
 
-var db, connectionError = database.Connect()
+var db = database.Connect()
 
 func ShowRegistrationForm(context *gin.Context) {
 	context.HTML(http.StatusOK, "registration.html", gin.H{})
 }
 
 func Register(context *gin.Context) {
-
-	if connectionError != nil {
-		log.Fatalf("could not connect to the database. Error : %s", connectionError)
-	}
-
 	db.AutoMigrate(models.User{})
 
 	password, _ := hashPassword(context.PostForm("password"))
