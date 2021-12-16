@@ -15,7 +15,7 @@ import (
 )
 
 func setup() {
-	// load the environment variables for the .env
+	// load the environment variables from the .env
 	err := godotenv.Load()
 
 	if err != nil {
@@ -30,7 +30,7 @@ func main() {
 	router.Static("public/css", "public/css")
 
 	sessionStore := cookie.NewStore([]byte(os.Getenv("APP_KEY")))
-	//sessionStore.Options(sessions.Options{MaxAge: 60 * 60 * 24}) // allow cookie to be sotred for 24 hours
+	//sessionStore.Options(sessions.Options{MaxAge: 60 * 60 * 24}) // allow cookies to be store for 24 hours
 	router.Use(sessions.Sessions(os.Getenv("APP_NAME"), sessionStore))
 
 	router.GET("login", auth.ShowLoginForm)
