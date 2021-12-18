@@ -39,7 +39,7 @@ func Login(context *gin.Context) {
 	if results.RowsAffected == 1 {
 		err := checkPasswordHash(loginDetails.Password, user.Password)
 		if err != nil {
-			context.HTML(http.StatusPermanentRedirect, "login.html", gin.H{
+			context.HTML(http.StatusFound, "login.html", gin.H{
 				"error": "Your login credentials are incorrect.",
 			})
 		}

@@ -33,6 +33,7 @@ func main() {
 	//sessionStore.Options(sessions.Options{MaxAge: 60 * 60 * 24}) // allow cookies to be store for 24 hours
 	router.Use(sessions.Sessions(os.Getenv("APP_NAME"), sessionStore))
 
+	router.GET("/", auth.ShowLoginForm)
 	router.GET("login", auth.ShowLoginForm)
 	router.POST("login", auth.Login)
 	router.GET("register", auth.ShowRegistrationForm)

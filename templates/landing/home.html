@@ -4,11 +4,99 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Expenses</title>
+    <link rel="stylesheet" href="public/css/app.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <p>
-        Welcome To Expensify. We help you tack the hassle of tracking you monthly expenses
-    </p>
+<div class="flex min-h-screen bg-gray-50">
+    <div class="px-6 bg-white shadow-sm w-72 sm:hidden md:hidden lg:block">
+        <div class="mt-3">
+            <span class="text-2xl font-bold text-indigo-600">
+                Expenses
+            </span>
+        </div>
+
+        <div class="mt-20 space-y-4">
+            <div
+                class="p-2 rounded-sm hover:bg-indigo-500 hover:text-white hover:rounded-lg active:bg-indigo-500 focus:text-white">
+                <a href="home">Dashboard</a>
+            </div>
+            <div
+                class="p-2 rounded-sm hover:bg-indigo-500 hover:text-white hover:rounded-lg active:bg-indigo-500 focus:text-white">
+                <a href="register">Expenditure</a>
+            </div>
+            <div
+                class="p-2 rounded-sm hover:bg-indigo-500 hover:text-white hover:rounded-lg active:bg-indigo-500 focus:text-white">
+                <a href="">Budget</a>
+            </div>
+            <div
+                class="p-2 rounded-sm hover:bg-indigo-500 hover:text-white hover:rounded-lg active:bg-indigo-500 focus:text-white">
+                <a href="">Payments</a>
+            </div>
+            <div
+                class="p-2 rounded-sm hover:bg-indigo-500 hover:text-white hover:rounded-lg active:bg-indigo-500 focus:text-white">
+                <a href="">Credit/Loans</a>
+            </div>
+        </div>
+    </div>
+    <div class="w-full p-3 mx-10">
+        <div>
+
+        </div>
+
+        <div class="grid gap-6 my-6 md:grid-cols-3">
+            <div class="p-6 bg-white shadow rounded-2xl">
+                <p class="text-sm text-gray-400 text-muted">
+                    Total Expenditure
+                </p>
+                <h4 class="mt-2 text-3xl font-bold">
+                    ¢ 1,540.23
+                </h4>
+            </div>
+            <div class="p-6 bg-white shadow rounded-2xl">
+                <p class="text-sm text-gray-400 text-muted">
+                    Total Income Amount
+                </p>
+                <h4 class="mt-2 text-3xl font-bold">
+                    ¢ 4,220
+                </h4>
+            </div>
+            <div class="p-6 bg-white shadow rounded-2xl">
+                <p class="text-sm text-gray-400 text-muted">
+                    Budget Level
+                </p>
+                <h4 class="mt-2 text-3xl font-bold">
+                    ¢ 2,000
+                </h4>
+                </div>
+                </div>
+
+                <div class="mt-10">
+                    <h4 class="text-xl font-bold">
+                        This Month's Expenditure
+                    </h4>
+                </div>
+                <div class="mt-10 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div class="inline-block min-w-full py-2 aling-middle sm:px-6 lg:px-8">
+                        <div class="overflow-hidden border-b border-gray-200 shadow">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Expenditure Type</th>
+                                        <th>Amount</th>
+                                        <th>Channel</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                </div>
 </body>
 </html>
