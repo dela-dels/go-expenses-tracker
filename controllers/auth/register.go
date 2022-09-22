@@ -29,7 +29,10 @@ func ShowRegistrationForm(context *gin.Context) {
 }
 
 func Register(context *gin.Context) {
-	db.AutoMigrate(models.User{})
+	err := db.AutoMigrate(models.User{})
+	if err != nil {
+		fmt.Printf("Unable to migrate tables %s", err)
+	}
 
 	password, _ := hashPassword(context.PostForm("password"))
 
@@ -59,7 +62,10 @@ func Register(context *gin.Context) {
 	session := sessions.Default(context)
 	randomSessionValue, _ := uuid.NewRandom()
 	session.Set(os.Getenv("APP_NAME"), randomSessionValue.String())
-	session.Save()
+	err = session.Save()
+	if err != nil {
+		fmt.Printf("session could not be established or saved. err: %s", err)
+	}
 
 	context.SetCookie(os.Getenv("APP_NAME"), randomSessionValue.String(), time.Now().Hour(), "/", os.Getenv("APP_URL"), true, true)
 	context.Redirect(http.StatusFound, "home")
@@ -72,10 +78,13 @@ func hashPassword(password string) (string, error) {
 
 func (u UserRegistrationDetails) validate() map[string]string {
 	validate := validator.New()
-	validate.RegisterValidation("unique-email", validateEmailToBeUnique)
+	err := validate.RegisterValidation("unique-email", validateEmailToBeUnique)
+	if err != nil {
+		return nil
+	}
 
 	var userRegistrationValidationErrors = map[string]string{}
-	err := validate.Struct(u)
+	err = validate.Struct(u)
 
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {

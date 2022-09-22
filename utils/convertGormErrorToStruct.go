@@ -19,7 +19,10 @@ func ConvertGormErrorToStruct(gormError error) GormError {
 		log.Fatalf("Could not marshall gorm error into custom struct. failed with : %v", err)
 	}
 
-	json.Unmarshal((byteError), &gormErrorStruct)
+	err = json.Unmarshal(byteError, &gormErrorStruct)
+	if err != nil {
+		return GormError{}
+	}
 
 	return gormErrorStruct
 }
