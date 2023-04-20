@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//this function is a middleware that runs to check if the user
+// Authenticated this function is a middleware that runs to check if the user
 //making the current request is authenticated or not (has a session)
 func Authenticated() gin.HandlerFunc {
 	return func(context *gin.Context) {
